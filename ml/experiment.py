@@ -3,7 +3,8 @@
 Discipline this enforces:
   * Iterate on the TUNE window only (2015-2021). Inside it we sub-split:
         train  <= tune_train_end (default 2019-12-31)
-        eval   2020-01-01 .. 2021-12-31        (with a 10d embargo gap)
+        eval   2020-01-01 .. 2021-12-31        (train purged by an embargo
+                                               that covers the label horizon)
     Every idea is judged here.
   * VALIDATE (2022-2025) is touched with `--final` ONLY, once an idea is
     locked. It is not a tuning surface.
@@ -78,7 +79,9 @@ def main() -> None:
     p.add_argument("--horizon", type=int, default=10)
     p.add_argument("--threshold", type=float, default=0.02)
     p.add_argument("--tune-train-end", default="2019-12-31")
-    p.add_argument("--embargo", type=int, default=10)
+    p.add_argument("--embargo", type=int, default=None,
+                   help="calendar days purged before each eval window "
+                        "(default: dataset.embargo_for(horizon))")
     p.add_argument("--final", action="store_true",
                    help="score on the validate window (2022-2025) instead of tune-internal")
     p.add_argument("--recency-weight", action="store_true",
@@ -86,6 +89,8 @@ def main() -> None:
     p.add_argument("--save", help="pickle the last trained model here")
     args = p.parse_args()
 
+    if args.embargo is None:
+        args.embargo = dataset.embargo_for(args.horizon)
     panel = _load_panel(args.horizon, args.threshold)
     n_feat = len(models._feat_cols(panel))
 
@@ -107,7 +112,8 @@ def main() -> None:
         sw = 0.5 ** (age_days / 504)  # ~2-year half-life
 
     print(f"scope: {scope}   train={len(train_p):,}  eval={len(eval_p):,}  "
-          f"n_feat={n_feat}  horizon={args.horizon}  thr={args.threshold}")
+          f"n_feat={n_feat}  horizon={args.horizon}  thr={args.threshold}  "
+          f"embargo={args.embargo}d")
     when = datetime.now().strftime("%m-%d %H:%M")
     rows, last_model = [], None
     for name in args.models:

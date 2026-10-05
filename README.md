@@ -14,14 +14,16 @@ An end-to-end swing-trading system for Indian equities (NIFTY 50). It covers a d
 
 | | ML strategy | NIFTY 50 buy & hold | SMA + RSI rules |
 |---|---|---|---|
-| Total return | **+113.7%** | +48.2% | −4.4% |
-| CAGR | **20.9%** | 10.4% | −1.1% |
-| Sharpe | 0.84 | — | −0.58 |
-| Max drawdown | −17.9% | −16.5% | −21.9% |
-| Trades | 115 | — | 964 |
-| Win rate / profit factor | 49% / 2.28 | — | 34% / 0.96 |
+| Total return | **+105.4%** | +48.2% | −4.4% |
+| CAGR | **19.8%** | 10.4% | −1.1% |
+| Sharpe | 0.75 | — | −0.58 |
+| Max drawdown | −21.4% | −16.5% | −21.9% |
+| Trades | 113 | — | 964 |
+| Win rate / profit factor | 49% / 2.17 | — | 34% / 0.96 |
 
-The model is a logistic regression over 25 scale-free technical features. It predicts **P(forward 20-day return > 5%)** and was trained on 2015–2021 only. Strategy parameters were tuned on 2020–21 using a model trained on data up to 2019, and the 2022–25 window was scored once. On that window, precision at a 0.6 probability threshold is **0.456 vs a 0.278 base rate (1.64× lift)**.
+The model is a logistic regression over 25 scale-free technical features. It predicts **P(forward 20-day return > 5%)** and was trained on 2015–2021 only, with the last 35 days purged so no training label reaches 2022. Strategy parameters were tuned on 2020–21 using a model trained on data up to 2019, and the 2022–25 window was scored once. On that window, precision at a 0.6 probability threshold is **0.436 vs a 0.280 base rate (1.56× lift)**.
+
+> **Leak found and fixed:** the first version used a 10-day embargo even though the label looks 20 *trading* days (about 28 calendar days) ahead, so the training data saw a few weeks of the test period. Fixing it (`ml/dataset.py::embargo_for`, plus regression tests) cut CAGR from 20.9% to 19.8% and the lift from 1.64× to 1.56×. The edge survived, but it had been slightly inflated.
 
 Full iteration log, including what was tried and rejected: [`ml/RESULTS.md`](ml/RESULTS.md).
 
@@ -39,7 +41,7 @@ Full iteration log, including what was tried and rejected: [`ml/RESULTS.md`](ml/
 
 1. **No look-ahead.** Features at *t* use data ≤ *t*, and orders fill at *t+1* open. Tests check both.
 2. **Costs are real.** A strategy that wins only before costs doesn't count.
-3. **Time-based ML splits only,** with an embargo at each boundary. No random shuffling of time series.
+3. **Time-based ML splits only.** The end of each training window is purged by an embargo that covers the label horizon. No random shuffling of time series.
 4. **The holdout (2026+) stays untouched** until the final evaluation.
 
 ## Tech stack
@@ -109,7 +111,7 @@ docs/                implementation plan, README chart
 - **Survivorship bias:** the universe is *today's* NIFTY 50 projected backwards, which overstates historical returns.
 - **48 of 50 stocks:** TATAMOTORS and LTIM return 404 errors on Yahoo.
 - **One validation window and one market regime.** There's no rolling multi-fold walk-forward yet. Most of the ML strategy's gains came in 2022 to early 2024, and it was roughly flat after that (see chart).
-- **Embargo is shorter than the label horizon:** the 10-calendar-day embargo is less than the 20-trading-day label horizon (about 28 calendar days), so a few weeks of labels at each split boundary overlap the next window.
+- **Deeper drawdown than the index** on validate (−21.4% vs −16.5%), from holding just 4 concentrated positions.
 - **Over the full 2012–2026 period**, the rule-based SMA+RSI strategy returns 7.8% CAGR against NIFTY's 11.6%. It's kept as a baseline, not as a strategy worth trading.
 - **Slippage** is a flat 5 bps: reasonable for large caps, optimistic in fast markets.
 

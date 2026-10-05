@@ -11,13 +11,17 @@ on data that overlaps the test period. Hence:
   data end).
 - Splits are TIME-BASED, never random. Random splits on time series leak:
   adjacent, near-identical rows land in both train and test → fake 90% acc.
-- An EMBARGO gap of `horizon` days is removed at every split boundary: the
-  label for a row on the last train day looks `horizon` days into the future,
-  i.e. straight into the test set. Without the gap the model is scored on
-  windows it partly saw the answer to.
+- An EMBARGO gap is PURGED from the end of every training window: the label
+  for a row on the last train day looks `horizon` TRADING days into the
+  future, i.e. straight into the test set. Without the gap the model is
+  scored on windows it partly saw the answer to. The gap is in calendar
+  days, so it must cover `horizon` trading days plus weekends and holidays
+  (see `embargo_for`).
 """
 
 from __future__ import annotations
+
+import math
 
 import pandas as pd
 
@@ -111,11 +115,20 @@ def build_panel(
     return panel.dropna(subset=feat_cols + ["y"])
 
 
+def embargo_for(horizon: int) -> int:
+    """Calendar-day embargo that safely covers a `horizon`-trading-day label.
+
+    5 trading days span 7 calendar days; +7 days of slack for market holidays
+    (e.g. 20 trading days → 35 calendar days).
+    """
+    return math.ceil(horizon * 7 / 5) + 7
+
+
 def time_split(
     panel: pd.DataFrame,
     test_start: str,
     *,
-    embargo_days: int = 10,
+    embargo_days: int = 35,
     test_end: str | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Train strictly before (test_start - embargo); test in [test_start, test_end].
@@ -136,18 +149,22 @@ def walk_forward_split(
     *,
     tune_end: str = "2021-12-31",
     validate_end: str = "2025-12-31",
-    embargo_days: int = 10,
+    embargo_days: int = 35,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Split a panel into (tune, validate, holdout) with embargo gaps.
+    """Split a panel into (tune, validate, holdout), purging label overlap.
 
-    tune     ..            <= tune_end
-    validate (tune_end + embargo) .. validate_end
-    holdout  (validate_end + embargo) ..
+    tune     ..  (tune_end - embargo)
+    validate (tune_end, validate_end - embargo]
+    holdout  (validate_end, ..
+
+    The embargo is cut from the END of each window, not the start of the next:
+    the evaluation windows keep their full calendar (the backtest on validate
+    starts on its first trading day), and no row's label reaches the next one.
     """
     emb = pd.Timedelta(days=embargo_days)
     t_end = pd.Timestamp(tune_end)
     v_end = pd.Timestamp(validate_end)
-    tune = panel[panel.index <= t_end]
-    validate = panel[(panel.index > t_end + emb) & (panel.index <= v_end)]
-    holdout = panel[panel.index > v_end + emb]
+    tune = panel[panel.index <= t_end - emb]
+    validate = panel[(panel.index > t_end) & (panel.index <= v_end - emb)]
+    holdout = panel[panel.index > v_end]
     return tune, validate, holdout

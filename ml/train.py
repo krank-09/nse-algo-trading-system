@@ -40,7 +40,9 @@ def main() -> None:
         raise SystemExit(f"no feature files in {feat_dir}")
 
     panel = dataset.build_panel(data, args.horizon, args.threshold)
-    train_p, test_p = dataset.time_split(panel, args.test_start)
+    train_p, test_p = dataset.time_split(
+        panel, args.test_start, embargo_days=dataset.embargo_for(args.horizon),
+    )
     print(f"train rows: {len(train_p)}  test rows: {len(test_p)}")
 
     model = models.train(train_p, args.model)

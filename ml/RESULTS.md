@@ -14,7 +14,8 @@ adjusted. Walk-forward windows (`data/frozen/MANIFEST.json`):
 | validate | 2022–2025 | touched once, at the end |
 | holdout | 2026+ | **never looked at** — still untouched |
 
-Every split boundary has a 10-day embargo gap (labels look 10–20 days ahead).
+Every training window is purged of its last `embargo_for(horizon)` calendar days
+(35 days for the 20-trading-day label), so no training label reaches the next window.
 
 ### What moved the needle
 
@@ -24,6 +25,7 @@ Every split boundary has a 10-day embargo gap (labels look 10–20 days ahead).
 | **+17 features** (multi-horizon momentum, 52w-high dist, vol regime, RSI-2, Bollinger pos, volume z, market-relative excess return, regime flag) | logistic becomes the strongest, most stable model |
 | **RobustScaler + ±5σ winsorize** (fat-tailed return features) | logistic precision@0.6 0.46 → 0.54 tune-internal |
 | **embargo gap at split boundary** | removes look-ahead leak that flattered earlier scores |
+| **embargo ≥ label horizon, purged from the training side** (2026-10-06 fix; was a 10-day gap vs a ~28-calendar-day label) | validate lift@0.6 1.64 → 1.56, CAGR 20.95% → 19.76%, max DD −17.9% → −21.4%: the edge is real but was slightly flattered |
 | **label = fwd 20-day return > 5%** (vs 10-day > 2%) | sharper edge: validate lift@0.6 1.30 → 1.64 |
 | dropped `ret_20d_rank` (cross-sectional, unavailable to the live 1-stock-at-a-time backtester) | train/live inputs now identical; edge unchanged |
 | hist_gbm / random_forest / soft ensemble | all tried, all overfit the pre-2020 window vs logistic — **logistic chosen** |
@@ -32,10 +34,11 @@ Every split boundary has a 10-day embargo gap (labels look 10–20 days ahead).
 
 `logistic` (RobustScaler → ±5σ clip → LogisticRegression C=0.5, class_weight
 balanced), label = P(forward 20-day return > 5%), 25 features.
-Artifact: `ml/artifacts/model.pkl` (trained on tune ≤ 2021).
+Artifact: `ml/artifacts/model.pkl` (trained on tune ≤ 2021, last 35 days purged).
 
-**Validate (2022–2025), scored once:** base rate 0.278 →
-**precision@0.6 = 0.456 (1.64× lift)**, precision@0.7 = 0.596 (2.1× lift).
+**Validate (2022–2025), scored once:** base rate 0.280 →
+**precision@0.6 = 0.436 (1.56× lift)**, precision@0.7 = 0.543 (1.94× lift).
+(Before the 2026-10-06 embargo fix: 0.456 / 1.64× and 0.596 — kept in the auto-log below.)
 
 ### Cost-aware backtest
 
@@ -45,19 +48,28 @@ Winner: `min_proba 0.50`, `exit_proba 0.45`, `max_positions 4` (concentration
 matters — the model's ranking is good but it fires rarely, so cash drag is the
 enemy).
 
-**Validate 2022–2025, locked params:**
+**Validate 2022–2025, locked params** (after the embargo fix; the sweep was re-run
+with the purged ≤2019 model and its ranking didn't change, so params stayed put):
 
 | | ML strategy | NIFTY buy&hold | sma_rsi (rule-based) |
 |---|---|---|---|
-| total return | **+113.7%** | +48.2% | −4.4% |
-| CAGR | **20.95%** | 10.37% | −1.11% |
-| Sharpe | 0.84 | — | −0.58 |
-| max drawdown | −17.9% | −16.5% | −21.9% |
-| trades | 115 | — | 964 |
-| win rate / profit factor | 49% / 2.28 | — | 34% / 0.96 |
+| total return | **+105.4%** | +48.2% | −4.4% |
+| CAGR | **19.76%** | 10.37% | −1.11% |
+| Sharpe | 0.75 | — | −0.58 |
+| max drawdown | −21.4% | −16.5% | −21.9% |
+| trades | 113 | — | 964 |
+| win rate / profit factor | 49% / 2.17 | — | 34% / 0.96 |
 
-The edge translates: ~2× the benchmark CAGR at comparable drawdown, ~29
-trades/year (genuine swing cadence). Winners are ~2.3× the size of losers.
+Pre-fix numbers for the record: +113.7%, 20.95% CAGR, Sharpe 0.84, max DD −17.9%,
+115 trades, PF 2.28.
+
+The edge translates: ~1.9× the benchmark CAGR, ~28 trades/year (genuine swing
+cadence), winners ~2.2× the size of losers. Drawdown is deeper than the index's.
+
+**On the param choice:** in the 2020–21 sweep, min_proba 0.60 / 4 positions has the
+highest Sharpe (2.39 vs 2.29), both before and after the fix. 0.50 was kept as the
+centre of a flat plateau with more signals; choosing again after seeing validate
+would turn validate into a tuning surface.
 
 ### Honest caveats
 
@@ -109,3 +121,5 @@ python -m ml.backtest_ml --split validate --min-proba 0.50 --max-positions 4
 | 09-04 11:22 | validate 22-25 | logistic | 20 | 0.05 | 25 | 0.278 | 0.456 | 1.637 | 597 | 0.596 | 0.355 | 1.276 |
 | 09-04 11:22 | validate 22-25 | ensemble | 20 | 0.05 | 25 | 0.278 | 0.500 | 1.797 | 326 | 0.387 | 0.344 | 1.235 |
 | 09-04 11:28 | validate 22-25 | logistic | 20 | 0.05 | 25 | 0.278 | 0.456 | 1.637 | 597 | 0.596 | 0.355 | 1.276 |
+| 10-06 00:20 | tune-internal 20-21 | logistic | 20 | 0.05 | 25 | 0.383 | 0.516 | 1.347 | 5302 | 0.575 | 0.570 | 1.488 |
+| 10-06 00:20 | validate 22-25 | logistic | 20 | 0.05 | 25 | 0.280 | 0.436 | 1.558 | 574 | 0.543 | 0.354 | 1.267 |
