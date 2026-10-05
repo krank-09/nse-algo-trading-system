@@ -1,0 +1,67 @@
+# Trading system configuration
+# NOTE: NIFTY 50 constituents change ~2x/year. This list is a snapshot —
+# update from https://www.niftyindices.com when rebalancing happens.
+# Survivorship bias caveat: backtests over today's list overstate returns slightly.
+
+data:
+  start_date: "2012-01-01"
+  end_date: null          # null = today
+  raw_dir: data/raw
+  processed_dir: data/processed
+  interval: "1d"          # daily candles for swing/long-term
+
+index:
+  symbol: "^NSEI"         # NIFTY 50 index (yfinance)
+  name: NIFTY50
+
+universe:                 # NSE tickers, yfinance needs the .NS suffix (added in loader)
+  - RELIANCE
+  - TCS
+  - HDFCBANK
+  - ICICIBANK
+  - INFY
+  - HINDUNILVR
+  - ITC
+  - SBIN
+  - BHARTIARTL
+  - KOTAKBANK
+  - LT
+  - BAJFINANCE
+  - AXISBANK
+  - ASIANPAINT
+  - MARUTI
+  - HCLTECH
+  - SUNPHARMA
+  - TITAN
+  - ULTRACEMCO
+  - NTPC
+  - WIPRO
+  - ONGC
+  - M&M
+  - POWERGRID
+  - TATAMOTORS
+  - TATASTEEL
+  - ADANIENT
+  - ADANIPORTS
+  - COALINDIA
+  - BAJAJFINSV
+  - NESTLEIND
+  - GRASIM
+  - TECHM
+  - HINDALCO
+  - JSWSTEEL
+  - INDUSINDBK
+  - DRREDDY
+  - CIPLA
+  - EICHERMOT
+  - APOLLOHOSP
+  - DIVISLAB
+  - BRITANNIA
+  - TATACONSUM
+  - BPCL
+  - HEROMOTOCO
+  - SBILIFE
+  - HDFCLIFE
+  - BAJAJ-AUTO
+  - LTIM
+  - SHRIRAMFIN

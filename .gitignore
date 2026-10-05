@@ -1,0 +1,28 @@
+# Python / env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.pytest_cache/
+
+# macOS / tools
+.DS_Store
+.claude/
+
+# Market data: regenerate with main.py (Yahoo/NSE/Kaggle data isn't ours to redistribute)
+data/raw/
+data/processed/
+data/features/
+data/bhavcopy/
+data/external/
+data/frozen/*
+!data/frozen/MANIFEST.json
+
+# Generated outputs / local state
+reports/
+paper_state.db
+*.db
+*.db-journal
+*.zip
+ml/artifacts/model_tune2019.pkl

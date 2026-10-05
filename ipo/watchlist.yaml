@@ -1,0 +1,22 @@
+# IPO watchlist — fill one entry per IPO you're considering.
+# Data sources: NSE/BSE IPO pages, chittorgarh.com, broker research notes.
+# GMP (grey market premium) is unofficial — treat as sentiment, not truth.
+#
+# Run:  python -m ipo.analyzer
+
+ipos:
+  - name: "Example Industries Ltd"        # delete this sample entry
+    close_date: "2026-07-20"
+    price_band_high: 315                   # ₹, top of band
+    lot_size: 47
+    subscription:                          # times subscribed (x), latest numbers
+      qib: 3.2                             # institutional demand = strongest signal
+      nii: 1.8
+      retail: 2.5
+    gmp: 40                                # grey market premium ₹/share (0 if unknown)
+    pe_ipo: 28                             # P/E at upper band
+    pe_peers: 35                           # median P/E of listed peers
+    fresh_issue_pct: 60                    # % fresh issue (vs pure promoter exit OFS)
+    promoter_holding_post: 55              # % promoter holding after listing
+    anchor_quality: good                   # good / average / weak (marquee funds?)
+    purpose: "capex + debt repayment"      # red flag if only 'OFS / promoter exit'

@@ -1,0 +1,364 @@
+{
+  "created_utc": "2026-09-04T05:48:30+00:00",
+  "source": "yfinance(auto_adjust)",
+  "walk_forward": {
+    "tune": [
+      "2015-01-01",
+      "2021-12-31"
+    ],
+    "validate": [
+      "2022-01-01",
+      "2025-12-31"
+    ],
+    "holdout": [
+      "2026-01-01",
+      null
+    ]
+  },
+  "n_files": 49,
+  "files": {
+    "ADANIENT": {
+      "file": "ADANIENT.parquet",
+      "sha256": "f5f1a909ebaba2bcdc894308bdb72c6171c55fd4061390449df2ce88a686dec0",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ADANIPORTS": {
+      "file": "ADANIPORTS.parquet",
+      "sha256": "95526863d108cfbd574ac57b3af98a07c0391669d81d03de1c6c6966745d3d2d",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "APOLLOHOSP": {
+      "file": "APOLLOHOSP.parquet",
+      "sha256": "c9a15b49521debb9bd613ebbc4f21b924710b388bfb238891a6e1294bd58c1e1",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ASIANPAINT": {
+      "file": "ASIANPAINT.parquet",
+      "sha256": "131a8fed2f24342f160bc5095ce4c32d2bac83c10f1fcc42598504fc31cbf492",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "AXISBANK": {
+      "file": "AXISBANK.parquet",
+      "sha256": "76c4ff4552bc1e22e3e51d1c240df7958bc742dc6434c0a7f39b2eac93e3d86a",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BAJAJ-AUTO": {
+      "file": "BAJAJ-AUTO.parquet",
+      "sha256": "431e1f21977ea7fc6654037a3e77c17aa0e10ed4088fff88152e4e74e854f505",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BAJAJFINSV": {
+      "file": "BAJAJFINSV.parquet",
+      "sha256": "f7d73c3e08127c01b7442d2d7d213c36c7ba069a78df2e6a1afdec4fe6029f50",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BAJFINANCE": {
+      "file": "BAJFINANCE.parquet",
+      "sha256": "a82d58eb9d851b4a3c35b726baa9e5cb6b859322bb3869164eacacd9eb4e5367",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BHARTIARTL": {
+      "file": "BHARTIARTL.parquet",
+      "sha256": "777a4604fe1c66db93e97cc0d44e339e9e75724b0051e9730c3862eed952e4ea",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BPCL": {
+      "file": "BPCL.parquet",
+      "sha256": "1983cb910386c6845a688cef3ff324a8644d3ad7c56e623f553f39d5cbae0ea9",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "BRITANNIA": {
+      "file": "BRITANNIA.parquet",
+      "sha256": "a4ca385c66e579a42a30eb4750775df8c478328beea9fce14d775ec25f387c1a",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "CIPLA": {
+      "file": "CIPLA.parquet",
+      "sha256": "4cacceae163d6a904d1979c69c253a2cb4a35cd9276f8680e7240987aa094279",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "COALINDIA": {
+      "file": "COALINDIA.parquet",
+      "sha256": "222a96f1ddbd66c8b6ecc54cc8f49b9de55f5626a8ebe61a3b25355ae071d6e5",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "DIVISLAB": {
+      "file": "DIVISLAB.parquet",
+      "sha256": "6fb36484e5876625840c095f7f264881c64a00dc48fc711dee8f377630f84fb4",
+      "rows": 3623,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "DRREDDY": {
+      "file": "DRREDDY.parquet",
+      "sha256": "862e588df00ada9839695a285c8e070cd7e2115bd09eb4830a35331dfc5b9539",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "EICHERMOT": {
+      "file": "EICHERMOT.parquet",
+      "sha256": "01cbcf18262784c3647918a33ed7fa4c204414446bf6fd14209d47e38800995e",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "GRASIM": {
+      "file": "GRASIM.parquet",
+      "sha256": "34de86f272b99b3355219224de90385051ea25fa7919e28f5a3ef1acd37519d1",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "HCLTECH": {
+      "file": "HCLTECH.parquet",
+      "sha256": "a32ae0c807209575dee885f95c5cb63a21e0c1062478ff853db4d4bcf0c9ec16",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "HDFCBANK": {
+      "file": "HDFCBANK.parquet",
+      "sha256": "d47416a99470ab05cc87c6a5f59b2b4b59f8f659050485187767ed0eae7f5bbb",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "HDFCLIFE": {
+      "file": "HDFCLIFE.parquet",
+      "sha256": "758d2d27398fd1ac2423ed693d67560db7c37a0ebe1c970ba04a2fdae76acbbc",
+      "rows": 2177,
+      "first_date": "2017-11-17",
+      "last_date": "2026-09-04"
+    },
+    "HEROMOTOCO": {
+      "file": "HEROMOTOCO.parquet",
+      "sha256": "e268fd730e58493d856a0d0c06ae628f5f0930ed2a965e6ca64527c58185da9a",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "HINDALCO": {
+      "file": "HINDALCO.parquet",
+      "sha256": "345c45ba313a8a85f5e21f42fe9744299e13bd2f6bc6a3cb2277b4d9dc345141",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "HINDUNILVR": {
+      "file": "HINDUNILVR.parquet",
+      "sha256": "75741e21120fe54517761bf6ccea2cdcc667b442ee1acebb2c118c490bded0d7",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ICICIBANK": {
+      "file": "ICICIBANK.parquet",
+      "sha256": "044ac1b97570233431b3d0a0d940033c81fd069095f589c81ae43749d298b578",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "IDX_NSEI": {
+      "file": "IDX_NSEI.parquet",
+      "sha256": "bbfbdcc5bc669d33eea19a05df9151f5c0b91df638bb78e8a60aab423e5985bd",
+      "rows": 3604,
+      "first_date": "2012-01-03",
+      "last_date": "2026-09-04"
+    },
+    "INDUSINDBK": {
+      "file": "INDUSINDBK.parquet",
+      "sha256": "6dcb717ed3c47050988e65501431b3c17c4474321ac0223743bc94b2e0c75056",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "INFY": {
+      "file": "INFY.parquet",
+      "sha256": "7772d729d727f340c9845aa5d05925ecd0ea7e6466c554364d2bfa3f77a41e10",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ITC": {
+      "file": "ITC.parquet",
+      "sha256": "29893815a61ef09f2c285c205f9fb075918ec0cb9281e844a5886b4be80a391e",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "JSWSTEEL": {
+      "file": "JSWSTEEL.parquet",
+      "sha256": "1a1e3a35c6e0452d02cf5ee79f51c6918fb08e32cdf99ae5ea4eb17a8eef045a",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "KOTAKBANK": {
+      "file": "KOTAKBANK.parquet",
+      "sha256": "9491a885a075f21b9ca50306144223b11dbebc5c4cd94172299f6b30e87bcb0a",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "LT": {
+      "file": "LT.parquet",
+      "sha256": "46a3b3073507dc215352fed9b948c1003e15495b25675c1f8a4e76bd28ef6c24",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "MARUTI": {
+      "file": "MARUTI.parquet",
+      "sha256": "eab5f63dbff3da3b5a95ab55991d2b22f74bdd42a6653ad2030b0a75fc26ff11",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "M_M": {
+      "file": "M_M.parquet",
+      "sha256": "74af0716837dd7877b74734e614ed7d8fc7f03fb7a758810e8a0c5e1aa119b72",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "NESTLEIND": {
+      "file": "NESTLEIND.parquet",
+      "sha256": "67736e706c261e5a1bb55bc323cfbcb35af3c5b24b844b3ed1bb6744f1f6e7f4",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "NTPC": {
+      "file": "NTPC.parquet",
+      "sha256": "45df86c6a83348043ec2ecc18ecb3a47bd5c692f8306d21018c9b23d8e631c7c",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ONGC": {
+      "file": "ONGC.parquet",
+      "sha256": "5b61aef0a2d289a2ab047d6a901890fd4a25cc182c669d2d496d96502f619ee8",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "POWERGRID": {
+      "file": "POWERGRID.parquet",
+      "sha256": "8f21789f27cb1348ba2cf930815fc5599f54b1d6a9641492bd5c725fc13e125c",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "RELIANCE": {
+      "file": "RELIANCE.parquet",
+      "sha256": "1be7c1aa4c6c6dc70bb0db456e601c12e028606101a7e4f2e7b04063f37f3ec0",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "SBILIFE": {
+      "file": "SBILIFE.parquet",
+      "sha256": "3179b198a52436178c6e8e7e908b2a77c387a136c65d24ed21582eeac4768fce",
+      "rows": 2209,
+      "first_date": "2017-10-03",
+      "last_date": "2026-09-04"
+    },
+    "SBIN": {
+      "file": "SBIN.parquet",
+      "sha256": "3c99fb399b17fa61c2fe2489bf6a55f71777867a02cbc58c9674683e7ba4f00f",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "SHRIRAMFIN": {
+      "file": "SHRIRAMFIN.parquet",
+      "sha256": "297fae2d0dc4edb9f11c623c4de294a86d0ebdbf9a892a9c753f3b4fea939004",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "SUNPHARMA": {
+      "file": "SUNPHARMA.parquet",
+      "sha256": "cda26cf91693aa20c01ce2b98dc84ec4ce5754ca29bf74d4de913628406ff002",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "TATACONSUM": {
+      "file": "TATACONSUM.parquet",
+      "sha256": "dec2d235585fbf7d1dc90660a9574579b48bb8b20d44b71405eab0ab6d7d3797",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "TATASTEEL": {
+      "file": "TATASTEEL.parquet",
+      "sha256": "97b2a1cf335e1528d504fce58d7e492e38103e28a7bb4eaf0ed618df18f166f4",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "TCS": {
+      "file": "TCS.parquet",
+      "sha256": "e5994eaf98abc363183c76291ea2aabcde48d6a0265430f66d7e405370da93c1",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "TECHM": {
+      "file": "TECHM.parquet",
+      "sha256": "a399a174f2deafb1d831722fd42eb91fee25502161d18b8bace5fea76f1d6448",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "TITAN": {
+      "file": "TITAN.parquet",
+      "sha256": "55a2dce1e685ca45512f833125c43740537e67adfb0a23a92120eebc8fb6352d",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "ULTRACEMCO": {
+      "file": "ULTRACEMCO.parquet",
+      "sha256": "5fb8f77060de32b971f5dfb08ba76e1ad2d858ce038b2cdc210db880a1227c42",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    },
+    "WIPRO": {
+      "file": "WIPRO.parquet",
+      "sha256": "e62fb38f837eb8c1ffba442752f427d66110faf4282f223c4d7132d235a778a4",
+      "rows": 3624,
+      "first_date": "2012-01-02",
+      "last_date": "2026-09-04"
+    }
+  }
+}
