@@ -17,16 +17,29 @@ import argparse
 
 import pandas as pd
 
-from backtesting import Backtester
+from backtesting import Backtester, save_report
 from data_engineering import freeze
 from ml.models import load
 from strategies import get_strategy
 from strategies.ml_strategy import MLStrategy
 
 
-def _run(strategy, data, index_feat, capital, label, *, max_positions=10):
+SPLIT_LABELS = {
+    "validate": "2022–25 out-of-sample",
+    "holdout": "2026+ holdout",
+    "tune": "2015–21 in-sample",
+    "tune_eval": "2020–21 tuning",
+    "tune_train": "2015–19 in-sample",
+    "all": "all data",
+}
+
+
+def _run(strategy, data, index_feat, capital, label, *, max_positions=10, report=None):
     bt = Backtester(strategy, initial_capital=capital, max_positions=max_positions)
     res = bt.run(data, index_feat)
+    if report is not None:
+        name, report_label, description = report
+        save_report(res, name, label=report_label, description=description)
     m = res.metrics
     print(f"\n=== {label} ===")
     for k in ("start", "end", "final_equity", "total_return_pct", "cagr_pct",
@@ -85,13 +98,20 @@ def main() -> None:
     ml_strat = MLStrategy(
         model=model, min_proba=args.min_proba, exit_proba=args.exit_proba,
     )
+    window = SPLIT_LABELS[args.split]
     _run(ml_strat, data, index_feat, args.capital,
          f"ML strategy (min_proba={args.min_proba}, max_positions={args.max_positions})",
-         max_positions=args.max_positions)
+         max_positions=args.max_positions,
+         report=(f"ml_{args.split}", f"ML strategy · {window}",
+                 f"Logistic model, enter at P≥{args.min_proba}, exit below {args.exit_proba}, "
+                 f"{args.max_positions} equal-weight positions."))
 
     if not args.skip_rulebased:
         _run(get_strategy("sma_rsi"), data, index_feat, args.capital,
-             "sma_rsi (rule-based reference)")
+             "sma_rsi (rule-based reference)",
+             report=(f"sma_rsi_{args.split}", f"SMA + RSI · {window}",
+                     "Rule-based baseline: close > SMA50 and RSI < 65, exit below SMA20, "
+                     "market-regime filter, 10 positions."))
 
 
 if __name__ == "__main__":

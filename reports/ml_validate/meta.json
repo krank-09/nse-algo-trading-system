@@ -1,0 +1,21 @@
+{
+  "label": "ML strategy \u00b7 2022\u201325 out-of-sample",
+  "description": "Logistic model, enter at P\u22650.5, exit below 0.45, 4 equal-weight positions.",
+  "created_utc": "2026-10-06T06:07:10+00:00",
+  "metrics": {
+    "start": "2022-01-03",
+    "end": "2025-12-31",
+    "final_equity": 2053681.8363331826,
+    "total_return_pct": 105.36818363331828,
+    "cagr_pct": 19.755111265324878,
+    "sharpe": 0.7493121298233351,
+    "max_drawdown_pct": -21.419222460510923,
+    "n_trades": 113,
+    "win_rate": 0.48672566371681414,
+    "profit_factor": 2.173082779781314,
+    "avg_pnl": 9324.618020647626,
+    "benchmark_return_pct": 48.24716616960454,
+    "benchmark_cagr_pct": 10.365810260571152,
+    "benchmark_max_dd_pct": -16.465934060306942
+  }
+}

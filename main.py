@@ -20,6 +20,8 @@ import pandas as pd
 
 from data_engineering import cleaner, features, loader
 
+STRATEGY_NAMES = {"sma_rsi": "SMA + RSI", "ml": "ML strategy"}
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
 
@@ -37,6 +39,8 @@ def main() -> None:
     p.add_argument("--tickers", nargs="*", help="override universe (for quick tests)")
     p.add_argument("--strategy", default="sma_rsi", help="strategy name (backtest mode)")
     p.add_argument("--capital", type=float, default=1_000_000)
+    p.add_argument("--max-positions", type=int, default=10,
+                   help="equal-weight slots (the ML strategy was validated with 4)")
     p.add_argument("--date", help="session date for --mode reconcile (YYYY-MM-DD)")
     p.add_argument("--tol", type=float, default=1.0, help="reconcile tolerance %%")
     args = p.parse_args()
@@ -75,8 +79,6 @@ def main() -> None:
     elif args.mode == "build-features":
         from pathlib import Path
 
-        import pandas as pd
-
         proc = Path(cfg["data"]["processed_dir"])
         feat_dir = proc.parent / "features"
         feat_dir.mkdir(parents=True, exist_ok=True)
@@ -97,9 +99,7 @@ def main() -> None:
     elif args.mode == "backtest":
         from pathlib import Path
 
-        import pandas as pd
-
-        from backtesting import Backtester
+        from backtesting import Backtester, save_report
         from strategies import get_strategy
 
         def read(f: Path) -> pd.DataFrame:
@@ -120,18 +120,21 @@ def main() -> None:
         if not data:
             raise SystemExit(f"No feature files in {feat_dir}. Run --mode build-features first.")
 
-        bt = Backtester(get_strategy(args.strategy), initial_capital=args.capital)
+        bt = Backtester(get_strategy(args.strategy), initial_capital=args.capital,
+                        max_positions=args.max_positions)
         result = bt.run(data, index_feat)
 
         print(f"\n=== {args.strategy} | {len(data)} instruments ===")
         for k, v in result.metrics.items():
             print(f"{k:>24}: {v:,.2f}" if isinstance(v, float) else f"{k:>24}: {v}")
 
-        reports = Path("reports")
-        reports.mkdir(exist_ok=True)
-        result.equity.to_csv(reports / "equity_curve.csv")
-        result.trades.to_csv(reports / "trades.csv", index=False)
-        print(f"\nSaved: {reports}/equity_curve.csv, {reports}/trades.csv")
+        out = save_report(
+            result, f"{args.strategy}_full",
+            label=f"{STRATEGY_NAMES.get(args.strategy, args.strategy)} · "
+                  f"{result.metrics['start'][:4]}–{result.metrics['end'][:4]} in-sample",
+            description=f"{len(data)} NIFTY 50 stocks, all available history (in-sample).",
+        )
+        print(f"\nSaved report: {out}/  (view with: streamlit run frontend/app.py)")
     elif args.mode == "paper-run":
         from data_engineering.features import build_features
         from execution import PaperTrader, StateStore
@@ -155,6 +158,7 @@ def main() -> None:
         trader = PaperTrader(
             get_strategy(args.strategy),
             StateStore("paper_state.db", initial_capital=args.capital),
+            max_positions=args.max_positions,
         )
         s = trader.run_daily(data, index_feat)
         print(f"\n=== paper run {s['date']} ===")

@@ -20,7 +20,8 @@ data/frozen/*
 !data/frozen/MANIFEST.json
 
 # Generated outputs / local state
-reports/
+reports/*
+!reports/ml_validate/
 paper_state.db
 *.db
 *.db-journal
