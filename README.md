@@ -4,7 +4,7 @@
 
 A swing-trading system for NIFTY 50 stocks: data pipeline, backtester, paper trading, a Streamlit dashboard and a walk-forward ML model. I built it to learn how a trading idea is tested without fooling yourself, so most of the work went into the backtester and the train/test splits rather than the strategy.
 
-![Equity curves on the 2022–25 validation window](docs/equity_validate.png)
+![Dashboard: strategy vs NIFTY 50 on the 2022–25 validation window](docs/dashboard_overview.png)
 
 Educational project, not financial advice.
 
@@ -21,6 +21,8 @@ Out-of-sample, 2022–2025, after costs:
 | Trades | 113 | – | 964 |
 
 The model is a logistic regression on 25 technical features. It predicts whether a stock will rise more than 5% over the next 20 trading days. It was trained on 2015–2021 only, and the 2022–25 window was scored once. At a 0.6 probability threshold its precision is 0.436, against a 0.280 base rate.
+
+![Drawdown, calendar-year returns and win rate](docs/dashboard_analysis.png)
 
 The first version had a leak. The training window ended with a 10-day gap before the test period, but the label looks 20 trading days (about 28 calendar days) ahead, so training labels overlapped the test period. Fixing it (`ml/dataset.py::embargo_for`, with regression tests) dropped CAGR from 20.9% to 19.8%. Everything I tried and dropped is in [`ml/RESULTS.md`](ml/RESULTS.md).
 
