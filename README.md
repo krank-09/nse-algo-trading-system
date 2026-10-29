@@ -1,124 +1,87 @@
 # NSE Algo Trading System
 
 [![tests](https://github.com/krank-09/nse-algo-trading-system/actions/workflows/tests.yml/badge.svg)](https://github.com/krank-09/nse-algo-trading-system/actions/workflows/tests.yml)
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-An end-to-end swing-trading system for Indian equities (NIFTY 50). It covers a data pipeline with second-source reconciliation, a **look-ahead-free backtester with real Indian transaction costs**, a paper-trading loop, a Streamlit dashboard, and a **walk-forward ML model**.
+A swing-trading system for NIFTY 50 stocks: data pipeline, backtester, paper trading, a Streamlit dashboard and a walk-forward ML model. I built it to learn how a trading idea is tested without fooling yourself, so most of the work went into the backtester and the train/test splits rather than the strategy.
 
-![Validate-window equity curves](docs/equity_validate.png)
+![Equity curves on the 2022–25 validation window](docs/equity_validate.png)
 
-> ⚠️ **Educational project, not financial advice.** Backtested results don't guarantee future returns.
+Educational project, not financial advice.
 
-## Results (out-of-sample, 2022–2025, after costs)
+## Results
+
+Out-of-sample, 2022–2025, after costs:
 
 | | ML strategy | NIFTY 50 buy & hold | SMA + RSI rules |
 |---|---|---|---|
-| Total return | **+105.4%** | +48.2% | −4.4% |
-| CAGR | **19.8%** | 10.4% | −1.1% |
-| Sharpe | 0.75 | — | −0.58 |
+| Total return | +105.4% | +48.2% | −4.4% |
+| CAGR | 19.8% | 10.4% | −1.1% |
+| Sharpe | 0.75 | – | −0.58 |
 | Max drawdown | −21.4% | −16.5% | −21.9% |
-| Trades | 113 | — | 964 |
-| Win rate / profit factor | 49% / 2.17 | — | 34% / 0.96 |
+| Trades | 113 | – | 964 |
 
-The model is a logistic regression over 25 scale-free technical features. It predicts **P(forward 20-day return > 5%)** and was trained on 2015–2021 only, with the last 35 days purged so no training label reaches 2022. Strategy parameters were tuned on 2020–21 using a model trained on data up to 2019, and the 2022–25 window was scored once. On that window, precision at a 0.6 probability threshold is **0.436 vs a 0.280 base rate (1.56× lift)**.
+The model is a logistic regression on 25 technical features. It predicts whether a stock will rise more than 5% over the next 20 trading days. It was trained on 2015–2021 only, and the 2022–25 window was scored once. At a 0.6 probability threshold its precision is 0.436, against a 0.280 base rate.
 
-> **Leak found and fixed:** the first version used a 10-day embargo even though the label looks 20 *trading* days (about 28 calendar days) ahead, so the training data saw a few weeks of the test period. Fixing it (`ml/dataset.py::embargo_for`, plus regression tests) cut CAGR from 20.9% to 19.8% and the lift from 1.64× to 1.56×. The edge survived, but it had been slightly inflated.
+The first version had a leak. The training window ended with a 10-day gap before the test period, but the label looks 20 trading days (about 28 calendar days) ahead, so training labels overlapped the test period. Fixing it (`ml/dataset.py::embargo_for`, with regression tests) dropped CAGR from 20.9% to 19.8%. Everything I tried and dropped is in [`ml/RESULTS.md`](ml/RESULTS.md).
 
-Full iteration log, including what was tried and rejected: [`ml/RESULTS.md`](ml/RESULTS.md).
+## How it works
 
-## What it does
+- **Data:** about 14 years of daily prices from yfinance, cleaned and turned into features. NSE bhavcopy files are used as a second source to catch gaps in the Yahoo data.
+- **Backtester:** a signal on day *t* fills at day *t+1*'s open, with slippage. Every trade pays brokerage, STT, exchange and SEBI fees, stamp duty, GST and DP charges, about 0.29% per round trip.
+- **Strategies:** a strategy only says whether it wants to hold each stock (0 or 1) each day. The engine turns that into orders, so the same code runs in the backtest and in paper trading.
+- **Paper trading:** a once-a-day loop after market close, with state kept in SQLite.
+- **Splits:** tune, validate and holdout periods are frozen with SHA-256 checksums. The 2026+ holdout hasn't been touched yet.
 
-- **Data pipeline:** about 14 years of daily OHLCV from yfinance → validation and cleaning → 25-column feature matrix. NSE bhavcopy serves as an independent second source to catch silent vendor gaps.
-- **Reproducible datasets:** walk-forward splits (tune / validate / holdout) are frozen with SHA-256 checksums.
-- **Backtester:** signals on day *t* fill at day *t+1*'s **open**, with slippage. Every trade pays brokerage, STT, exchange, SEBI, stamp duty, GST and DP charges, about 0.29% per round trip.
-- **Strategies as desired state:** a strategy returns `{0,1}` per day and the engine converts that into orders. The same strategy code runs in backtest and in paper trading.
-- **Paper trading:** a daily end-of-day loop with crash-safe SQLite state.
-- **Dashboard:** a read-only Streamlit view of backtests and the paper portfolio.
-- **IPO scorecard:** a rule-based scoring of upcoming IPOs from subscription, valuation and issue-structure data.
-
-## Design rules
-
-1. **No look-ahead.** Features at *t* use data ≤ *t*, and orders fill at *t+1* open. Tests check both.
-2. **Costs are real.** A strategy that wins only before costs doesn't count.
-3. **Time-based ML splits only.** The end of each training window is purged by an embargo that covers the label horizon. No random shuffling of time series.
-4. **The holdout (2026+) stays untouched** until the final evaluation.
-
-## Tech stack
-
-Python · pandas · NumPy · scikit-learn · Streamlit · SQLite · pyarrow · yfinance · pytest · GitHub Actions
-
-## How to run
+## Running it
 
 ```bash
 git clone https://github.com/krank-09/nse-algo-trading-system.git
 cd nse-algo-trading-system
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
-pytest -q                                              # unit tests, no network needed
+pytest -q                      # no network needed
 ```
 
-Market data isn't committed; the pipeline downloads it:
+Market data isn't committed. To rebuild everything:
 
 ```bash
-# 1. Data
-python main.py --mode fetch-data --tickers RELIANCE TCS   # quick test
-python main.py --mode fetch-data                          # full NIFTY 50
+python main.py --mode fetch-data          # full NIFTY 50 (add --tickers RELIANCE TCS for a quick test)
 python main.py --mode clean-data
 python main.py --mode build-features
-python main.py --mode freeze                              # → data/frozen/ + MANIFEST.json
+python main.py --mode freeze              # writes data/frozen/ and MANIFEST.json
 
-# 2. Rule-based backtest
-python main.py --mode backtest --strategy sma_rsi         # → reports/
-
-# 3. ML: iterate on tune, score validate once
-python -m ml.experiment --models logistic hist_gbm --horizon 20 --threshold 0.05
-python -m ml.experiment --final --models logistic --horizon 20 --threshold 0.05 \
-       --save ml/artifacts/model.pkl
+python main.py --mode backtest --strategy sma_rsi
+python -m ml.experiment --final --models logistic --horizon 20 --threshold 0.05 --save ml/artifacts/model.pkl
 python -m ml.backtest_ml --split validate --min-proba 0.50 --max-positions 4
-python -m scripts.make_readme_chart                       # regenerate the chart above
 
-# 4. Paper trading (once a day after 15:30 IST) + dashboard
-python main.py --mode paper-run
-python main.py --mode paper-status
+python main.py --mode paper-run           # once a day after 15:30 IST
 streamlit run frontend/app.py
-
-# 5. NSE bhavcopy reconciliation / IPO scoring
-python main.py --mode reconcile --date 2026-09-03
-python -m ipo.analyzer                                    # fill ipo/watchlist.yaml first
 ```
 
-A fresh download won't match `data/frozen/MANIFEST.json` byte for byte, because Yahoo back-adjusts history. The manifest records exactly what the published results were computed on.
+A fresh download won't match `MANIFEST.json` exactly, because Yahoo adjusts old prices. The manifest records the data the results above came from.
 
-## Project layout
+## Layout
 
 ```
-main.py              CLI entry point
-config.yaml          universe (NIFTY 50), dates, paths
-data_engineering/    loader → cleaner → features; bhavcopy (2nd source); freeze
-strategies/          base contract + registry; sma_rsi; ML strategy
-backtesting/         engine (next-open fills), costs, metrics
-execution/           paper trader + SQLite state store
+main.py              command-line entry point
+data_engineering/    loading, cleaning, features, bhavcopy check, freezing
+strategies/          strategy interface, SMA+RSI baseline, ML strategy
+backtesting/         engine, costs, metrics
+execution/           paper trader and its SQLite store
 frontend/            Streamlit dashboard
-ml/                  dataset (embargoed splits), models, experiments, RESULTS.md
-ipo/                 IPO scorecard
-tests/               pytest suite (costs, metrics, engine, features, splits)
-docs/                implementation plan, README chart
+ml/                  embargoed splits, models, experiments
+ipo/                 rule-based IPO scorecard
+tests/               pytest suite
 ```
 
 ## Limitations
 
-- **Survivorship bias:** the universe is *today's* NIFTY 50 projected backwards, which overstates historical returns.
-- **48 of 50 stocks:** TATAMOTORS and LTIM return 404 errors on Yahoo.
-- **One validation window and one market regime.** There's no rolling multi-fold walk-forward yet. Most of the ML strategy's gains came in 2022 to early 2024, and it was roughly flat after that (see chart).
-- **Deeper drawdown than the index** on validate (−21.4% vs −16.5%), from holding just 4 concentrated positions.
-- **Over the full 2012–2026 period**, the rule-based SMA+RSI strategy returns 7.8% CAGR against NIFTY's 11.6%. It's kept as a baseline, not as a strategy worth trading.
-- **Slippage** is a flat 5 bps: reasonable for large caps, optimistic in fast markets.
-
-## Regulatory note (India)
-
-Under SEBI's April 2026 retail-algo framework, staying under 10 orders/sec means no algo registration is needed. Live trading through a broker API requires a whitelisted static IP and OAuth 2FA. IPO applications can't be automated.
+- The stock list is today's NIFTY 50 applied to the past, which overstates historical returns (survivorship bias).
+- 48 of 50 stocks: Yahoo returns errors for TATAMOTORS and LTIM.
+- One validation window in one market regime. Most of the gain came in 2022 to early 2024; after that the strategy was roughly flat.
+- The drawdown is deeper than the index because it holds only 4 positions at a time.
+- Slippage is a flat 5 bps, which is optimistic in fast markets.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT
