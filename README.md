@@ -4,6 +4,8 @@
 
 A swing-trading system for NIFTY 50 stocks: data pipeline, backtester, paper trading, a Streamlit dashboard and a walk-forward ML model. I built it to learn how a trading idea is tested without fooling yourself, so most of the work went into the backtester and the train/test splits rather than the strategy.
 
+**Live dashboard:** https://algo-trading-system.streamlit.app/ (free hosting, so it can take about 30 seconds to wake up)
+
 ![Dashboard: strategy vs NIFTY 50 on the 2022–25 validation window](docs/dashboard_overview.png)
 
 Educational project, not financial advice.
